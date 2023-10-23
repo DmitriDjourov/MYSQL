@@ -1,0 +1,39 @@
+
+-- 1. выведите название курса и имя старосты
+
+SELECT t3.title as course_name, t1.name as starosta
+FROM courses t3
+LEFT JOIN students t1
+ON t3.headman_id = t1.id;
+
+-- 2. выведите имя студента и имена старост, которые есть на курсах, которые он проходит
+-- SQL ORACLE
+
+SELECT  a.id,
+		a.name as student,
+		c.headman_id,
+		n.name as starosta,
+		b.course_id,
+		m.title 
+FROM students a, students2courses b, courses c, students n, courses m
+WHERE a.id = b.student_id
+AND b.course_id = c.id
+AND n.id = m.headman_id
+AND c.headman_id =  m.headman_id;
+
+-- MYSQL
+SELECT s.id,
+		s.name AS student,
+		c.headman_id,
+		n.name AS starosta,
+		b.course_id,
+		m.title
+FROM students s
+JOIN students2courses b 
+ON s.id = b.student_id
+JOIN courses c 
+ON b.course_id = c.id
+JOIN students n 
+ON c.headman_id = n.id
+JOIN courses m 
+ON c.headman_id = m.headman_id;
