@@ -1,0 +1,72 @@
+-- ДЗ (БД airport)
+
+-- 1. Определите клиентов, которые пользуются оператором МТС в Мурманской области (коды оператора 911, 981 -- ненайдено ) и летали первым классом на самолетах, зарегистрированных не в России.
+-- Коды сотовых операторов в Москве и Московской области МТС — 910, 915, 916, 917, 919, 980, 985, 986, 989;
+-- В выборке должен присутствовать один атрибут : id.
+
+select a.id
+from clients a 
+where a.id in (select b.client_id from tickets b where service_class = 'FirstClass');
+-- and a.phone like ('+7911%') or a.phone like ('+7980%');
+
+select distinct a.id
+from clients a 
+left join tickets b
+on a.id = b.client_id
+where a.id in (select b.client_id from tickets b where service_class = 'FirstClass');
+-- and a.phone like ('+7911%') or a.phone like ('+7980%');
+
+-- 2. Найдите задержанные рейсы на самолеты с дальностью полета меньше 10000 километров.
+-- В выборке должен присутствовать один атрибут - id.
+
+select a.*
+from airliners a,trips b
+where a.range_ < 10000
+and b.status ='Delayed'
+and a.id = b.airliner_id;
+
+select a.id
+from airliners a
+inner join trips b
+on a.id = b.airliner_id
+and a.range_ < 10000
+and b.status ='Delayed';
+
+-- 3. Найдите самолеты, построенные позже 1990 года и хотя бы раз слетавшие в Домодедово (код аэропорта DME).
+-- В выборке должны присутствовать три атрибута: id, model_name, production_year.
+
+select a.id, a.model_name, a.production_year 
+from airliners a 
+where a.production_year > 1990 
+and a.id IN (select b.airliner_id from trips b where b.arrival = 'DME');
+
+select a.id, a.model_name, a.production_year , b.arrival
+from airliners a 
+inner join trips b
+on a.id = b.airliner_id
+and  b.arrival = 'DME'
+and a.production_year > 1990 
+order by a.id;
+
+-- *4. Вывести максимальную цену на билет среди рейсов на самолеты с максимальной дальностью полета.
+-- Вывести : max_price
+
+select max(d.price) as  max_price
+from tickets d
+where d.trip_id in (select c.id
+					from trips c
+                    where c.airliner_id in (select b.id 
+											from airliners b 
+                                            where b.range_  in (select max(a.range_) 
+																  from airliners a)));
+                                            
+select max(d.price) as max_price
+from tickets d
+inner join trips c
+on d.trip_id = c.id
+inner join airliners b
+on c.airliner_id = b.id
+where b.range_ in (select max(a.range_) from airliners a ); 
+
+
+                                   
