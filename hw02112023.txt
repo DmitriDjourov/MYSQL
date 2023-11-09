@@ -1,20 +1,14 @@
 -- ДЗ (БД airport)
 
 -- 1. Определите клиентов, которые пользуются оператором МТС в Мурманской области (коды оператора 911, 981 -- ненайдено ) и летали первым классом на самолетах, зарегистрированных не в России.
--- Коды сотовых операторов в Москве и Московской области МТС — 910, 915, 916, 917, 919, 980, 985, 986, 989;
 -- В выборке должен присутствовать один атрибут : id.
 
-select a.id
-from clients a 
-where a.id in (select b.client_id from tickets b where service_class = 'FirstClass');
--- and a.phone like ('+7911%') or a.phone like ('+7980%');
-
-select distinct a.id
-from clients a 
-left join tickets b
-on a.id = b.client_id
-where a.id in (select b.client_id from tickets b where service_class = 'FirstClass');
--- and a.phone like ('+7911%') or a.phone like ('+7980%');
+SELECT cl.id 
+FROM clients cl
+LEFT JOIN tickets tck ON cl.id = tck.client_id
+LEFT JOIN trips trp ON tck.trip_id = trp.id
+LEFT JOIN airliners air on trp.airliner_id  = air.id
+WHERE (cl.phone like '+7911%' OR cl.phone like '+7980%') AND air.country = 'Russia' AND tck.service_class = 'FirstClass';
 
 -- 2. Найдите задержанные рейсы на самолеты с дальностью полета меньше 10000 километров.
 -- В выборке должен присутствовать один атрибут - id.
